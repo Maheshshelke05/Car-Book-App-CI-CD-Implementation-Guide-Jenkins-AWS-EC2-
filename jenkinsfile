@@ -1,0 +1,179 @@
+pipeline {
+    agent any
+
+    environment {
+        SERVER_IP = '13.204.83.19'
+        SSH_CREDENTIAL = 'node-app-key'
+        REPO_URL = 'https://github.com/dalvipiyush07/Book-app-node.git'
+        BRANCH = 'main'
+        REMOTE_USER = 'ubuntu'
+        REMOTE_PATH = '/home/ubuntu/node-app'
+        APP_NAME = 'manoranjanpe-app'
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+                echo '🧹 Workspace cleaned successfully'
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                git branch: "${BRANCH}", url: "${REPO_URL}"
+                echo '📦 Repository cloned successfully'
+                sh 'ls -la'
+                
+                // Simple package.json validation without readJSON
+                sh '''
+                    if [ ! -f "package.json" ]; then
+                        echo "❌ package.json not found!"
+                        exit 1
+                    else
+                        echo "✅ package.json found"
+                        cat package.json | grep -E '"name"|"version"'
+                    fi
+                '''
+            }
+        }
+
+        stage('Upload Files to EC2') {
+            steps {
+                script {
+                    sshagent(["${SSH_CREDENTIAL}"]) {
+                        echo '🚀 Starting file upload to EC2...'
+                        
+                        // Create directory structure
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} '
+                                mkdir -p ${REMOTE_PATH}
+                                cd ${REMOTE_PATH}
+                                rm -rf *
+                            '
+                        """
+                        
+                        // Upload files using scp
+                        sh """
+                            scp -o StrictHostKeyChecking=no -r ./* ${REMOTE_USER}@${SERVER_IP}:${REMOTE_PATH}/
+                        """
+                        
+                        echo '📁 Files uploaded successfully'
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sshagent(["${SSH_CREDENTIAL}"]) {
+                        echo '📦 Installing dependencies...'
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "
+                                cd ${REMOTE_PATH}
+                                echo 'Current directory: \$(pwd)'
+                                echo 'Files in directory:'
+                                ls -la
+                                
+                                # Install dependencies
+                                npm install --production
+                                
+                                # Verify installation
+                                if [ -d 'node_modules' ]; then
+                                    echo '✅ Dependencies installed successfully'
+                                else
+                                    echo '❌ Dependencies installation failed'
+                                    exit 1
+                                fi
+                            "
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                script {
+                    sshagent(["${SSH_CREDENTIAL}"]) {
+                        echo '🚀 Deploying application...'
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "
+                                cd ${REMOTE_PATH}
+                                
+                                # Check if PM2 is installed, install if not
+                                if ! command -v pm2 &> /dev/null; then
+                                    echo '📥 Installing PM2 globally...'
+                                    npm install -g pm2
+                                fi
+                                
+                                # Stop existing application if running
+                                if pm2 list | grep -q '${APP_NAME}'; then
+                                    echo '🔄 Restarting existing application...'
+                                    pm2 stop ${APP_NAME} || true
+                                    pm2 delete ${APP_NAME} || true
+                                    sleep 2
+                                fi
+                                
+                                # Start the application
+                                echo '🎬 Starting ManoranjanPe application...'
+                                pm2 start app.js --name ${APP_NAME}
+                                
+                                # Save PM2 configuration
+                                pm2 save
+                                
+                                echo '📊 Application deployment status:'
+                                pm2 list
+                                
+                                echo '🔍 Checking if app is running...'
+                                sleep 3
+                                pm2 show ${APP_NAME}
+                            "
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    echo '🏥 Performing health check...'
+                    // Wait for app to start
+                    sleep 10
+                    
+                    sh """
+                        # Try health check with retry logic
+                        for i in 1 2 3; do
+                            if curl -f http://${SERVER_IP}:3000/api/health; then
+                                echo '✅ Health check passed!'
+                                exit 0
+                            else
+                                echo '⚠️ Health check attempt \$i failed, retrying...'
+                                sleep 5
+                            fi
+                        done
+                        echo '❌ Health check failed after 3 attempts'
+                        exit 1
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "🔚 Build ${currentBuild.result} - ${currentBuild.fullDisplayName}"
+            archiveArtifacts artifacts: '**/*.js, **/*.json, **/ecosystem.config.js', fingerprint: true
+        }
+        success {
+            echo '🎉 ✅ Deployment completed successfully!'
+            // Removed email to avoid connection issues
+        }
+        failure {
+            echo '💥 ❌ Deployment failed!'
+            // Removed email to avoid connection issues
+        }
+    }
+}
