@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SERVER_IP = '13.204.83.19'
+        SERVER_IP = '172.31.2.219'
         SSH_CREDENTIAL = 'node-app-key'
-        REPO_URL = 'https://github.com/dalvipiyush07/Book-app-node.git'
+        REPO_URL = 'https://github.com/Maheshshelke05/Car-Book-App-CI-CD-Implementation-Guide-Jenkins-AWS-EC2-.git'
         BRANCH = 'main'
         REMOTE_USER = 'ubuntu'
         REMOTE_PATH = '/home/ubuntu/node-app'
