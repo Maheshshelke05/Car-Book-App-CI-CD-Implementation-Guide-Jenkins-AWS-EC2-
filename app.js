@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Car data
+// Car data matching your design
 const cars = [
     {
         id: 1,
@@ -66,38 +66,10 @@ const cars = [
         },
         description: "Revolutionary design meets extraordinary performance in this British masterpiece.",
         color: "#ff6b35"
-    },
-    {
-        id: 5,
-        name: "Audi R8 V10 Plus",
-        type: "Sports Car",
-        price: "$197,000",
-        specs: {
-            engine: "5.2L V10",
-            horsepower: "602 HP",
-            acceleration: "0-60: 3.2s",
-            topspeed: "205 mph"
-        },
-        description: "German engineering excellence with everyday supercar capabilities.",
-        color: "#00d4ff"
-    },
-    {
-        id: 6,
-        name: "BMW M8 Competition",
-        type: "Grand Tourer",
-        price: "$146,000",
-        specs: {
-            engine: "4.4L V8 Twin-Turbo",
-            horsepower: "617 HP",
-            acceleration: "0-60: 3.0s",
-            topspeed: "190 mph"
-        },
-        description: "Luxury meets extreme performance in this ultimate driving machine.",
-        color: "#2d2d2d"
     }
 ];
 
-// Routes
+// Main Route
 app.get('/', (req, res) => {
     res.send(`
     <!DOCTYPE html>
@@ -129,6 +101,7 @@ app.get('/', (req, res) => {
             </nav>
 
             <main class="main-content">
+                <!-- Hero Section -->
                 <section class="hero" id="home">
                     <div class="hero-content">
                         <h1>Experience Cars in Stunning 3D</h1>
@@ -172,6 +145,7 @@ app.get('/', (req, res) => {
                     </div>
                 </section>
 
+                <!-- Features Section -->
                 <section class="features-section" id="features">
                     <div class="section-header">
                         <h2>Why Choose AutoVision 3D?</h2>
@@ -202,6 +176,7 @@ app.get('/', (req, res) => {
                     </div>
                 </section>
 
+                <!-- Car Models Section -->
                 <section class="car-models-section" id="models">
                     <div class="section-header">
                         <h2>Featured Car Models</h2>
@@ -210,7 +185,7 @@ app.get('/', (req, res) => {
                     <div class="car-grid">
                         ${cars.map(car => `
                             <div class="car-card" onclick="viewCarDetails(${car.id})">
-                                <div class="car-image" style="background: ${car.color}">
+                                <div class="car-image">
                                     <div class="mini-car">
                                         <div class="mini-body" style="background: ${car.color}"></div>
                                         <div class="mini-wheels">
@@ -236,6 +211,7 @@ app.get('/', (req, res) => {
                     </div>
                 </section>
 
+                <!-- Customization Section -->
                 <section class="customization-section" id="customize">
                     <div class="section-header">
                         <h2>Customize Your Dream Car</h2>
@@ -266,6 +242,7 @@ app.get('/', (req, res) => {
                 </section>
             </main>
 
+            <!-- Footer -->
             <footer class="footer" id="contact">
                 <div class="footer-content">
                     <div class="footer-section">
@@ -336,7 +313,6 @@ app.get('/', (req, res) => {
             // View car details
             function viewCarDetails(carId) {
                 alert(\`Loading 3D view for car ID: \${carId}\\nThis would open an immersive 3D viewer in a full implementation.\`);
-                // In a real implementation, this would load the specific car model
             }
 
             function exploreModels() {
@@ -351,7 +327,7 @@ app.get('/', (req, res) => {
                 });
             }
 
-            // Add click listeners for smooth scrolling
+            // Smooth scrolling for navigation links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -421,62 +397,8 @@ app.get('/api/health', (req, res) => {
 
 // Helper function to get CSS
 function getCSS() {
-    return `
-    /* Additional CSS for enhanced styling */
-    .stats {
-        display: flex;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-    
-    .stat {
-        text-align: center;
-    }
-    
-    .stat h3 {
-        font-size: 2rem;
-        color: var(--primary);
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat p {
-        color: var(--light-gray);
-        font-size: 0.9rem;
-    }
-    
-    .mini-car {
-        width: 120px;
-        height: 60px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .mini-body {
-        width: 100px;
-        height: 40px;
-        border-radius: 8px 8px 4px 4px;
-        position: relative;
-    }
-    
-    .mini-wheels {
-        position: absolute;
-        bottom: -8px;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        padding: 0 10px;
-    }
-    
-    .mini-wheel {
-        width: 15px;
-        height: 15px;
-        background: #333;
-        border-radius: 50%;
-        border: 2px solid #b8b8b8;
-    }
-    `;
+    // CSS content is already included in the app.css file
+    return '';
 }
 
 // Start server
