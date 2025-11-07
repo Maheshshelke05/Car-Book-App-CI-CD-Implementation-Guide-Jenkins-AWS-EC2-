@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -220,7 +219,7 @@ app.get('/app.css', (req, res) => {
             letter-spacing: 1px;
         }
 
-        /* 3D Car Container */
+        /* Advanced 3D Car Container */
         .car-container {
             flex: 1;
             display: flex;
@@ -228,69 +227,110 @@ app.get('/app.css', (req, res) => {
             justify-content: center;
             position: relative;
             min-height: 600px;
+            perspective: 1200px;
         }
 
-        .car-model {
+        .car-scene {
             width: 100%;
             max-width: 800px;
             height: 400px;
-            background: linear-gradient(135deg, var(--carbon), #444444);
-            border-radius: 20px;
             position: relative;
             transform-style: preserve-3d;
-            transform: perspective(1000px) rotateY(15deg);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.5),
-                inset 0 0 100px rgba(255, 107, 53, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        .car-body {
-            width: 80%;
+        .car-model {
+            width: 400px;
             height: 200px;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            border-radius: 10px 10px 5px 5px;
             position: relative;
             transform-style: preserve-3d;
-            animation: carFloat 6s ease-in-out infinite;
+            transform: rotateY(20deg);
+            transition: transform 0.5s ease;
         }
 
-        @keyframes carFloat {
-            0%, 100% { transform: translateY(0px) rotateX(5deg); }
-            50% { transform: translateY(-10px) rotateX(5deg); }
+        /* Realistic Car Body */
+        .car-body {
+            position: absolute;
+            width: 400px;
+            height: 120px;
+            background: linear-gradient(45deg, #ff2800, #ff6b6b);
+            border-radius: 15px 15px 8px 8px;
+            transform-style: preserve-3d;
+            box-shadow: 
+                inset 0 -10px 20px rgba(0,0,0,0.3),
+                0 10px 30px rgba(255, 40, 0, 0.2);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .car-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ff2800);
+            border-radius: 15px 15px 0 0;
         }
 
         .car-roof {
-            width: 50%;
-            height: 100px;
-            background: linear-gradient(135deg, #ff8c42, #ff6b35);
-            border-radius: 5px 5px 0 0;
             position: absolute;
-            top: -80px;
-            left: 25%;
-        }
-
-        .car-window {
-            width: 90%;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
-            border-radius: 3px;
-            position: absolute;
-            top: 20px;
-            left: 5%;
-        }
-
-        .wheel {
-            width: 80px;
+            width: 200px;
             height: 80px;
-            background: var(--dark);
-            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ff2800);
+            top: -70px;
+            left: 100px;
+            border-radius: 10px 10px 0 0;
+            transform-style: preserve-3d;
+            box-shadow: inset 0 5px 15px rgba(255,255,255,0.1);
+        }
+
+        .windshield {
             position: absolute;
-            bottom: -40px;
-            border: 8px solid var(--metal);
+            width: 180px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.4), rgba(0,212,255,0.1));
+            top: 10px;
+            left: 10px;
+            border-radius: 5px;
+            transform: translateZ(1px);
+        }
+
+        .side-window {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(0,212,255,0.05));
+            border-radius: 3px;
+        }
+
+        .window-left {
+            top: 15px;
+            left: 20px;
+            transform: translateZ(2px);
+        }
+
+        .window-right {
+            top: 15px;
+            right: 20px;
+            transform: translateZ(2px);
+        }
+
+        /* Realistic Wheels */
+        .wheel {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #2d2d2d 0%, #1a1a1a 70%);
+            border-radius: 50%;
+            border: 8px solid #444;
+            bottom: -25px;
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -300,27 +340,147 @@ app.get('/app.css', (req, res) => {
             content: '';
             width: 40px;
             height: 40px;
-            background: var(--gray);
+            background: radial-gradient(circle, #555 0%, #333 100%);
             border-radius: 50%;
+            border: 3px solid #666;
         }
 
-        .wheel-front-left { left: 15%; }
-        .wheel-front-right { right: 15%; }
-        .wheel-rear-left { left: 65%; }
-        .wheel-rear-right { right: 65%; }
-
-        .headlight {
-            width: 20px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 5px;
+        .wheel::after {
+            content: '';
             position: absolute;
-            bottom: 20px;
-            box-shadow: 0 0 20px var(--accent);
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: wheelSpin 3s linear infinite;
         }
 
-        .headlight-left { left: 5%; }
-        .headlight-right { right: 5%; }
+        @keyframes wheelSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .wheel-front-left { left: 50px; }
+        .wheel-front-right { right: 50px; }
+        .wheel-rear-left { left: 280px; }
+        .wheel-rear-right { right: 280px; }
+
+        /* Headlights */
+        .headlight {
+            position: absolute;
+            width: 25px;
+            height: 12px;
+            background: linear-gradient(45deg, #fff, #00d4ff);
+            border-radius: 6px;
+            bottom: 20px;
+            box-shadow: 0 0 20px #00d4ff, 0 0 40px rgba(0,212,255,0.5);
+            animation: headlightGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes headlightGlow {
+            0% { box-shadow: 0 0 20px #00d4ff, 0 0 40px rgba(0,212,255,0.5); }
+            100% { box-shadow: 0 0 30px #00d4ff, 0 0 60px rgba(0,212,255,0.8); }
+        }
+
+        .headlight-left { left: 15px; }
+        .headlight-right { right: 15px; }
+
+        /* Grille and Details */
+        .grille {
+            position: absolute;
+            width: 120px;
+            height: 20px;
+            background: linear-gradient(45deg, #333, #555);
+            bottom: 40px;
+            left: 140px;
+            border-radius: 3px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+            padding: 2px;
+            transform: translateZ(1px);
+        }
+
+        .grille-bar {
+            background: linear-gradient(45deg, #666, #888);
+            border-radius: 1px;
+        }
+
+        .brand-logo {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: gold;
+            border-radius: 50%;
+            top: 45px;
+            left: 185px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 0.7rem;
+            transform: translateZ(3px);
+            box-shadow: 0 2px 10px rgba(255,215,0,0.3);
+        }
+
+        /* Exhaust */
+        .exhaust {
+            position: absolute;
+            width: 15px;
+            height: 8px;
+            background: linear-gradient(45deg, #666, #333);
+            border-radius: 4px;
+            right: 10px;
+            bottom: 35px;
+            transform: translateZ(1px);
+        }
+
+        .exhaust::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 5px;
+            background: linear-gradient(90deg, rgba(255,100,0,0.8), transparent);
+            right: -20px;
+            top: 1px;
+            border-radius: 2px;
+            animation: exhaustSmoke 1.5s ease-in-out infinite;
+        }
+
+        @keyframes exhaustSmoke {
+            0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+            50% { opacity: 0.7; transform: scaleX(1.2); }
+        }
+
+        /* Environment */
+        .showroom-floor {
+            position: absolute;
+            width: 600px;
+            height: 300px;
+            background: linear-gradient(45deg, #2d2d2d, #1a1a1a);
+            bottom: -150px;
+            border-radius: 10px;
+            transform: rotateX(75deg) translateZ(-100px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .floor-reflection {
+            position: absolute;
+            width: 400px;
+            height: 100px;
+            background: linear-gradient(transparent, rgba(255,107,53,0.1));
+            bottom: -150px;
+            border-radius: 50%;
+            filter: blur(10px);
+            transform: rotateX(75deg) translateZ(-90px);
+            animation: reflectionPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes reflectionPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
 
         /* Features Section */
         .features-section {
@@ -426,38 +586,47 @@ app.get('/app.css', (req, res) => {
             overflow: hidden;
         }
 
-        .mini-car {
-            width: 120px;
-            height: 60px;
+        .car-preview {
+            width: 200px;
+            height: 100px;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transform-style: preserve-3d;
+            transform: rotateY(25deg);
         }
 
-        .mini-body {
+        .preview-body {
+            width: 200px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff2800, #ff6b6b);
+            border-radius: 10px 10px 5px 5px;
+            position: relative;
+        }
+
+        .preview-roof {
             width: 100px;
             height: 40px;
-            border-radius: 8px 8px 4px 4px;
-            position: relative;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            background: linear-gradient(45deg, #ff6b6b, #ff2800);
+            position: absolute;
+            top: -35px;
+            left: 50px;
+            border-radius: 5px 5px 0 0;
         }
 
-        .mini-wheels {
+        .preview-wheels {
             position: absolute;
-            bottom: -8px;
+            bottom: -15px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 20px;
         }
 
-        .mini-wheel {
-            width: 15px;
-            height: 15px;
-            background: #333;
+        .preview-wheel {
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #333, #1a1a1a);
             border-radius: 50%;
-            border: 2px solid #b8b8b8;
+            border: 3px solid #444;
         }
 
         .car-specs {
@@ -538,6 +707,7 @@ app.get('/app.css', (req, res) => {
             cursor: pointer;
             border: 3px solid transparent;
             transition: transform 0.3s, border-color 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .color-option:hover {
@@ -640,9 +810,8 @@ app.get('/app.css', (req, res) => {
                 justify-content: center;
             }
             
-            .car-model {
-                transform: perspective(800px) rotateY(10deg);
-                height: 300px;
+            .car-scene {
+                transform: scale(0.8);
                 margin-top: 2rem;
             }
             
@@ -665,8 +834,8 @@ app.get('/app.css', (req, res) => {
                 font-size: 1rem;
             }
             
-            .car-model {
-                height: 250px;
+            .car-scene {
+                transform: scale(0.6);
             }
             
             .section-header h2 {
@@ -684,7 +853,7 @@ app.get('/app.css', (req, res) => {
     `);
 });
 
-// Car data matching your design
+// Car data
 const cars = [
     {
         id: 1,
@@ -803,16 +972,26 @@ app.get('/', (req, res) => {
                         </div>
                     </div>
                     <div class="car-container">
-                        <div class="car-model" id="mainCarModel">
-                            <div class="car-body">
+                        <div class="car-scene">
+                            <div class="showroom-floor"></div>
+                            <div class="floor-reflection"></div>
+                            <div class="car-model" id="mainCarModel">
+                                <div class="car-body"></div>
                                 <div class="car-roof"></div>
-                                <div class="car-window"></div>
+                                <div class="windshield"></div>
+                                <div class="side-window window-left"></div>
+                                <div class="side-window window-right"></div>
                                 <div class="wheel wheel-front-left"></div>
                                 <div class="wheel wheel-front-right"></div>
                                 <div class="wheel wheel-rear-left"></div>
                                 <div class="wheel wheel-rear-right"></div>
                                 <div class="headlight headlight-left"></div>
                                 <div class="headlight headlight-right"></div>
+                                <div class="grille">
+                                    ${Array(6).fill('<div class="grille-bar"></div>').join('')}
+                                </div>
+                                <div class="brand-logo">F</div>
+                                <div class="exhaust"></div>
                             </div>
                         </div>
                     </div>
@@ -859,11 +1038,12 @@ app.get('/', (req, res) => {
                         ${cars.map(car => `
                             <div class="car-card" onclick="viewCarDetails(${car.id})">
                                 <div class="car-image">
-                                    <div class="mini-car">
-                                        <div class="mini-body" style="background: ${car.color}"></div>
-                                        <div class="mini-wheels">
-                                            <div class="mini-wheel"></div>
-                                            <div class="mini-wheel"></div>
+                                    <div class="car-preview">
+                                        <div class="preview-body" style="background: ${car.color}"></div>
+                                        <div class="preview-roof" style="background: ${car.color}"></div>
+                                        <div class="preview-wheels">
+                                            <div class="preview-wheel"></div>
+                                            <div class="preview-wheel"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -899,16 +1079,26 @@ app.get('/', (req, res) => {
                         <div class="color-option" style="background: #ffffff;" onclick="changeCarColor('#ffffff')"></div>
                     </div>
                     <div class="car-container">
-                        <div class="car-model">
-                            <div class="car-body" id="customizableCar">
+                        <div class="car-scene">
+                            <div class="showroom-floor"></div>
+                            <div class="floor-reflection"></div>
+                            <div class="car-model" id="customizableCar">
+                                <div class="car-body"></div>
                                 <div class="car-roof"></div>
-                                <div class="car-window"></div>
+                                <div class="windshield"></div>
+                                <div class="side-window window-left"></div>
+                                <div class="side-window window-right"></div>
                                 <div class="wheel wheel-front-left"></div>
                                 <div class="wheel wheel-front-right"></div>
                                 <div class="wheel wheel-rear-left"></div>
                                 <div class="wheel wheel-rear-right"></div>
                                 <div class="headlight headlight-left"></div>
                                 <div class="headlight headlight-right"></div>
+                                <div class="grille">
+                                    ${Array(6).fill('<div class="grille-bar"></div>').join('')}
+                                </div>
+                                <div class="brand-logo">F</div>
+                                <div class="exhaust"></div>
                             </div>
                         </div>
                     </div>
@@ -970,11 +1160,16 @@ app.get('/', (req, res) => {
 
             // Car color customization
             function changeCarColor(color) {
-                const carBody = document.getElementById('customizableCar');
-                const mainCar = document.querySelector('#mainCarModel .car-body');
+                const carBody = document.querySelectorAll('.car-body');
+                const carRoof = document.querySelectorAll('.car-roof');
                 
-                carBody.style.background = \`linear-gradient(135deg, \${color}, \${color}dd)\`;
-                mainCar.style.background = \`linear-gradient(135deg, \${color}, \${color}dd)\`;
+                carBody.forEach(body => {
+                    body.style.background = \`linear-gradient(45deg, \${color}, \${color}bb)\`;
+                });
+                
+                carRoof.forEach(roof => {
+                    roof.style.background = \`linear-gradient(45deg, \${color}bb, \${color})\`;
+                });
                 
                 // Update active color option
                 document.querySelectorAll('.color-option').forEach(option => {
@@ -1014,21 +1209,75 @@ app.get('/', (req, res) => {
                 });
             });
 
-            // Auto-rotate main car model
-            let rotation = 15;
+            // Auto-rotate main car model with mouse interaction
+            let rotation = 20;
+            let autoRotate = true;
+            const mainCar = document.getElementById('mainCarModel');
+            const customCar = document.getElementById('customizableCar');
+
             setInterval(() => {
-                rotation += 0.2;
-                document.getElementById('mainCarModel').style.transform = \`perspective(1000px) rotateY(\${rotation}deg)\`;
+                if (autoRotate) {
+                    rotation += 0.3;
+                    mainCar.style.transform = \`rotateY(\${rotation}deg)\`;
+                    customCar.style.transform = \`rotateY(\${rotation}deg)\`;
+                }
             }, 50);
 
-            console.log('🚗 AutoVision 3D - Immersive car experience loaded!');
+            // Mouse interaction for car rotation
+            let isDragging = false;
+            let startX, startRotation;
+
+            mainCar.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startRotation = rotation;
+                autoRotate = false;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - startX;
+                rotation = startRotation + (deltaX * 0.5);
+                mainCar.style.transform = \`rotateY(\${rotation}deg)\`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                setTimeout(() => {
+                    autoRotate = true;
+                }, 3000);
+            });
+
+            // Touch interaction for mobile
+            mainCar.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                startRotation = rotation;
+                autoRotate = false;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.touches[0].clientX - startX;
+                rotation = startRotation + (deltaX * 0.5);
+                mainCar.style.transform = \`rotateY(\${rotation}deg)\`;
+            });
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+                setTimeout(() => {
+                    autoRotate = true;
+                }, 3000);
+            });
+
+            console.log('🚗 AutoVision 3D - Realistic car experience loaded!');
         </script>
     </body>
     </html>
     `);
 });
 
-// API Routes
+// API Routes (same as before)
 app.get('/api/cars', (req, res) => {
     res.json({
         success: true,
@@ -1072,7 +1321,7 @@ app.get('/api/health', (req, res) => {
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`
     🚗  AutoVision 3D Server Started Successfully!
-    🚀  Version: 1.0.0
+    🚀  Version: 2.0.0 (Realistic 3D)
     📍  Server: http://localhost:${PORT}
     🩺  Health: http://localhost:${PORT}/api/health
     🎮  Cars API: http://localhost:${PORT}/api/cars
